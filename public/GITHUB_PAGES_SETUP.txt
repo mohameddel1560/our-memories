@@ -1,0 +1,1 @@
+GitHub Pages deployment is configured from the repository source.
