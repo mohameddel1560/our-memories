@@ -3,39 +3,18 @@ import react from '@vitejs/plugin-react';
 import tailwindcss from '@tailwindcss/vite';
 import { defineConfig } from 'vite';
 
-// تعيين المسار الافتراضي لـ GitHub Pages بناءً على اسم المستودع
-const basePath = process.env.BASE_PATH || '/our-memories/';
-const port = Number(process.env.PORT) || 5173;
-
 export default defineConfig({
-  base: basePath,
-  plugins: [
-    react(),
-    tailwindcss(),
-  ],
+  base: '/our-memories/',
+  plugins: [react(), tailwindcss()],
   resolve: {
     alias: {
       '@': path.resolve(import.meta.dirname, 'src'),
-      '@assets': path.resolve(
-        import.meta.dirname,
-        '..',
-        '..',
-        'attached_assets',
-      ),
     },
     dedupe: ['react', 'react-dom'],
   },
   root: path.resolve(import.meta.dirname),
   build: {
-    outDir: 'dist',
+    outDir: path.resolve(import.meta.dirname, 'dist'),
     emptyOutDir: true,
-  },
-  server: {
-    port,
-    host: '0.0.0.0',
-  },
-  preview: {
-    port,
-    host: '0.0.0.0',
   },
 });
