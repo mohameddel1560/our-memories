@@ -77,15 +77,6 @@ const ui = {
     appTagline: 'тільки для нас двох',
     privatePlace: 'Наш особливий простір',
     language: 'العربية',
-    loginEyebrow: 'Тільки для нас двох',
-    loginTitle: 'Увійти до нашої маленької таємниці',
-    loginBody: 'Це місце чекає тільки на вас. Введіть ваші маленькі секретні знаки.',
-    usernameLabel: 'Ім’я користувача',
-    passwordLabel: 'Пароль',
-    usernamePlaceholder: 'Введіть ім’я користувача',
-    passwordPlaceholder: 'Введіть пароль',
-    loginButton: 'Відкрити наше місце',
-    loginError: 'Ім’я користувача або пароль неправильні.',
     heroEyebrow: 'Далеко, але завжди поруч',
     heroTitle: ['Усе, що між нами,', 'збережено тут.'],
     heroBody:
@@ -172,15 +163,6 @@ const ui = {
     appTagline: 'لينا إحنا الاتنين بس',
     privatePlace: 'مكاننا الخاص',
     language: 'Українська',
-    loginEyebrow: 'لينا إحنا الاتنين بس',
-    loginTitle: 'ندخل سرّنا الصغير',
-    loginBody: 'المكان ده مستنيكم. اكتبوا العلامات السرية الصغيرة بتاعتنا.',
-    usernameLabel: 'اسم المستخدم',
-    passwordLabel: 'الباسورد',
-    usernamePlaceholder: 'اكتب اسم المستخدم',
-    passwordPlaceholder: 'اكتب الباسورد',
-    loginButton: 'افتح مكاننا',
-    loginError: 'اسم المستخدم أو الباسورد مش صح.',
     heroEyebrow: 'بعيدين، بس دايمًا قريبين',
     heroTitle: ['كل اللي بينا،', 'محفوظ هنا.'],
     heroBody:
@@ -271,10 +253,6 @@ const dateToday = (offset = 0) => {
   return value.toISOString().slice(0, 10);
 };
 
-const AUTH_USERNAME = '💘💘💘';
-const AUTH_PASSWORD = '🦆🐈';
-const AUTH_SESSION_KEY = 'our-memories:authenticated';
-
 const readStorage = <T,>(key: string, fallback: T): T => {
   if (typeof window === 'undefined') return fallback;
   try {
@@ -289,15 +267,6 @@ const saveStorage = (key: string, value: unknown) => {
   try {
     window.localStorage.setItem(key, JSON.stringify(value));
     return true;
-  } catch {
-    return false;
-  }
-};
-
-const readSession = (key: string) => {
-  if (typeof window === 'undefined') return false;
-  try {
-    return window.sessionStorage.getItem(key) === 'true';
   } catch {
     return false;
   }
@@ -609,84 +578,8 @@ function MemoryForm({
   );
 }
 
-function LoginGate({
-  language,
-  onLanguageToggle,
-  onUnlock,
-}: {
-  language: Language;
-  onLanguageToggle: () => void;
-  onUnlock: () => void;
-}) {
-  const t = ui[language];
-  const [username, setUsername] = useState('');
-  const [password, setPassword] = useState('');
-  const [hasError, setHasError] = useState(false);
-
-  const submit = (event: FormEvent<HTMLFormElement>) => {
-    event.preventDefault();
-    if (username === AUTH_USERNAME && password === AUTH_PASSWORD) {
-      try {
-        window.sessionStorage.setItem(AUTH_SESSION_KEY, 'true');
-      } catch {
-        // The gate still works for this session if storage is unavailable.
-      }
-      onUnlock();
-      return;
-    }
-    setHasError(true);
-    setPassword('');
-  };
-
-  return (
-    <main dir={language === 'uk' ? 'ltr' : 'rtl'} className="paper-grain flex min-h-[100dvh] items-center justify-center overflow-hidden px-5 py-8 text-[hsl(var(--foreground))] sm:px-8">
-      <div className="relative w-full max-w-lg">
-        <div className="pointer-events-none absolute -left-5 top-6 flex -rotate-12 gap-1 text-[hsl(var(--accent))] sm:-left-10">
-          <Heart size={22} fill="currentColor" />
-          <Heart size={31} fill="currentColor" />
-          <Heart size={18} fill="currentColor" />
-        </div>
-        <div className="pointer-events-none absolute -right-4 bottom-12 flex rotate-12 gap-1 text-[#8ea8a0] sm:-right-9">
-          <Heart size={18} fill="currentColor" />
-          <Heart size={30} fill="currentColor" />
-          <Heart size={22} fill="currentColor" />
-        </div>
-
-        <section className="entrance relative overflow-hidden rounded-[2.2rem] bg-[hsl(var(--primary))] p-7 text-[hsl(var(--primary-foreground))] shadow-[0_22px_50px_-28px_hsl(235_32%_20%_/_0.7)] sm:p-10">
-          <Heart className="pointer-events-none absolute -right-8 -top-6 text-[#f7eee1]/10" size={145} fill="currentColor" strokeWidth={1} />
-          <Heart className="pointer-events-none absolute -bottom-7 -left-8 text-[hsl(var(--accent))]/10" size={110} fill="currentColor" strokeWidth={1} />
-          <div className="relative">
-            <div className="mb-7 flex items-start justify-between gap-4">
-              <div>
-                <div className="mb-4 flex items-center gap-2 text-xs font-semibold tracking-[.16em] text-[#b9b2c3]"><Heart size={14} className="text-[hsl(var(--accent))]" fill="currentColor" />{t.loginEyebrow}</div>
-                <h1 className="font-arabic text-4xl font-bold leading-tight text-[#f7eee1] sm:text-5xl">{t.loginTitle}</h1>
-                <p className="mt-4 max-w-md font-arabic text-lg leading-8 text-[#d5ccd5]">{t.loginBody}</p>
-              </div>
-              <button className="focus-ring shrink-0 rounded-full border border-[#f7eee1]/20 bg-[#373750]/70 p-2.5 text-[#f7eee1] transition-transform hover:-translate-y-0.5" onClick={onLanguageToggle} aria-label={t.language} title={t.language}><Languages size={17} /></button>
-            </div>
-
-            <form className="space-y-4" onSubmit={submit}>
-              <label className="block">
-                <span className="mb-2 block text-sm font-semibold text-[#f7eee1]">{t.usernameLabel}</span>
-                <input className="focus-ring w-full rounded-xl border border-[#f7eee1]/15 bg-[#f7eee1]/10 px-4 py-3 font-ui text-lg text-[#f7eee1] outline-none placeholder:text-[#b9b2c3] focus:border-[hsl(var(--accent))]" value={username} onChange={(event) => { setUsername(event.target.value); setHasError(false); }} placeholder={t.usernamePlaceholder} autoComplete="username" required />
-              </label>
-              <label className="block">
-                <span className="mb-2 block text-sm font-semibold text-[#f7eee1]">{t.passwordLabel}</span>
-                <input type="password" className="focus-ring w-full rounded-xl border border-[#f7eee1]/15 bg-[#f7eee1]/10 px-4 py-3 font-ui text-lg tracking-[.2em] text-[#f7eee1] outline-none placeholder:text-[#b9b2c3] placeholder:tracking-normal focus:border-[hsl(var(--accent))]" value={password} onChange={(event) => { setPassword(event.target.value); setHasError(false); }} placeholder={t.passwordPlaceholder} autoComplete="current-password" required />
-              </label>
-              {hasError && <p className="rounded-xl border border-[#f2b5aa]/30 bg-[#f2b5aa]/10 px-4 py-3 text-sm font-semibold text-[#ffd9d3]" role="alert">{t.loginError}</p>}
-              <button className="focus-ring flex w-full items-center justify-center gap-2 rounded-xl bg-[hsl(var(--accent))] px-5 py-3.5 font-semibold text-[#3e3040] shadow-[3px_3px_0_#f7eee1] transition-transform hover:-translate-y-0.5 active:translate-y-0" type="submit"><LockKeyhole size={17} />{t.loginButton}<Heart size={16} fill="currentColor" /></button>
-            </form>
-          </div>
-        </section>
-      </div>
-    </main>
-  );
-}
-
 function Home() {
   const [language, setLanguage] = useState<Language>(() => readStorage(LANGUAGE_KEY, 'uk' as Language));
-  const [isUnlocked, setIsUnlocked] = useState(() => readSession(AUTH_SESSION_KEY));
   const t = ui[language];
   const [memories, setMemories] = useState<Memory[]>(() => readStorage(MEMORY_KEY, seededMemories));
   const [settings, setSettings] = useState<CoupleSettings>(() => {
@@ -803,10 +696,6 @@ function Home() {
   };
 
   const toggleLanguage = () => setLanguage((current) => current === 'uk' ? 'ar' : 'uk');
-
-  if (!isUnlocked) {
-    return <LoginGate language={language} onLanguageToggle={toggleLanguage} onUnlock={() => setIsUnlocked(true)} />;
-  }
 
   return (
     <main dir={language === 'uk' ? 'ltr' : 'rtl'} className="paper-grain min-h-[100dvh] overflow-hidden text-[hsl(var(--foreground))]">
